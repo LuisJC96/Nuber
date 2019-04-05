@@ -10,6 +10,7 @@ import android.os.AsyncTask
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.util.Log
+import android.widget.Toast
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 
@@ -49,6 +50,8 @@ class NUberMapsActivity : SupportMapFragment(),
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         getMapAsync(this)
 
+
+
     }
 
     /**
@@ -71,6 +74,7 @@ class NUberMapsActivity : SupportMapFragment(),
         setUpMap()
     }
     private fun setUpMap(){
+        Log.i("Mapas","Setup")
         if(ActivityCompat.checkSelfPermission(activity!!, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
         {
             ActivityCompat.requestPermissions(activity!!, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
@@ -91,29 +95,33 @@ class NUberMapsActivity : SupportMapFragment(),
                 placeMarkerOnMap(location2)
                 val URL = getDirectionURL(LatLng(lastLocation.latitude, lastLocation.longitude), location2)
                 GetDirection(URL).execute()
+
             }
         }
 
     }
     fun getDirectionURL(origin:LatLng, dest:LatLng): String{
-        val result = "https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}" +
-                "&destination=${dest.latitude},${dest.longitude}&sensor=false&mode=driving"
+        Log.i("Mapas","URL")
+        val result = "https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}" + "&destination=${dest.latitude},${dest.longitude}&sensor=false&mode=driving&key=AIzaSyBvrbt81PnDN3F9XLLiKj4jCG5pzBYsajY"
+        Log.i("String api", result)
         return result
     }
     private inner class GetDirection(val url : String) : AsyncTask<Void,Void,List<List<LatLng>>>(){
+
         override fun doInBackground(vararg params: Void?): List<List<LatLng>> {
+            Log.i("Mapas","Driection")
             val client = OkHttpClient()
             val request = Request.Builder().url(url).build()
             val response = client.newCall(request).execute()
             val data = response.body()!!.string()
-            Log.d("GoogleMap" , " data : $data")
+            Log.i("Mapas" , " data : $data")
             val result =  ArrayList<List<LatLng>>()
             try{
                 val respObj = Gson().fromJson(data,GoogleMapDTO::class.java)
 
                 val path =  ArrayList<LatLng>()
-
                 for (i in 0..(respObj.routes[0].legs[0].steps.size-1)){
+
 //                    val startLatLng = LatLng(respObj.routes[0].legs[0].steps[i].start_location.lat.toDouble()
 //                            ,respObj.routes[0].legs[0].steps[i].start_location.lng.toDouble())
 //                    path.add(startLatLng)
@@ -177,6 +185,7 @@ class NUberMapsActivity : SupportMapFragment(),
         return poly
     }
     private fun placeMarkerOnMap(location: LatLng) {
+        Log.i("Mapas","place marker")
         val markerOptions = MarkerOptions().position(location)
         val titleStr =  "I am Here!"//getAddress(location)  // add these two lines
         markerOptions.title(titleStr)
@@ -185,6 +194,7 @@ class NUberMapsActivity : SupportMapFragment(),
 
 
     private fun checkUserLogged() {
+        Log.i("Mapas","user logged")
         val uid = FirebaseAuth.getInstance().uid
         if (uid == null) {
             val intent = Intent(activity!!, RegisterActivity::class.java)
