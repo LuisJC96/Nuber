@@ -4,10 +4,12 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.recyclerview.extensions.ListAdapter
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -30,13 +32,13 @@ class NuberProductsFragment : Fragment() {
     //private val salads = listOf<Salad>(Salad("pollo", "Best", "899"))
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_nuber_products, container, false)
     }
@@ -48,27 +50,45 @@ class NuberProductsFragment : Fragment() {
             layoutManager = LinearLayoutManager(activity)
             adapter = NuberProductsAdapter(mutableListOf<Salad>())
         }
-        getProducts()
+        getProducts(view)
+
+
     }
 
-    private fun getProducts(){
-        val refFirebase = FirebaseDatabase.getInstance().getReference("/salads")
+    private fun getProducts(view:View){
+        val refFirebase = FirebaseDatabase.getInstance().getReference("salads")
         refFirebase.addValueEventListener(object: ValueEventListener{
             override fun onCancelled(p0: DatabaseError) {
 
             }
             override fun onDataChange(p0: DataSnapshot) {
                 val lista = mutableListOf<Salad>()
-                p0.children.forEach{
+                var tv = view.findViewById<TextView>(R.id.totalTV)
+                var total = 0.0
 
+
+                var recyclerView:RecyclerView = view.findViewById<RecyclerView>(R.id.list_recycler_view)
+                p0.children.forEach{
                     val producto = it.getValue(Salad::class.java)
-                    Log.i("Producto:",it.toString())
+
+                    total += producto!!.precio
+                    Log.i("Precio p",total.toString())
                     lista.add(producto!!)
-                    list_recycler_view.adapter = NuberProductsAdapter(lista)
+                    recyclerView.adapter = NuberProductsAdapter(lista)
+
                 }
+                tv?.text = "$" + total
+                Log.i("Precio Total",total.toString())
+
             }
 
+
+
         })
+
+
+
+
     }
 
 

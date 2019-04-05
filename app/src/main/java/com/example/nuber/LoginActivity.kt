@@ -38,7 +38,7 @@ class LoginActivity : AppCompatActivity() {
                 Toast.makeText(applicationContext,
                     " id: ${it.result!!.user.uid}", Toast.LENGTH_LONG).show()
 
-                val intent = Intent(this, NUberMapsActivity::class.java)
+                val intent = Intent(this, NavBar::class.java)
                 startActivity(intent)
             }
             .addOnFailureListener {

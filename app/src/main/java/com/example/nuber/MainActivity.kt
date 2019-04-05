@@ -7,15 +7,8 @@ import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
-import android.widget.Toast
-import com.example.nuber.NuberPagerAdapter
-import com.example.nuber.R
-import com.example.nuber.RegisterActivity
-import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
 import kotlinx.android.synthetic.main.activity_main.*
 
 
@@ -70,4 +63,5 @@ class MainActivity : AppCompatActivity() {
 data class Salad(
     val name: String = "",
     val description: String = "",
+    val precio: Double = 0.0,
     var uuid: String = "")

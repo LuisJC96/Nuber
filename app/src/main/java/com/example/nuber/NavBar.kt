@@ -1,5 +1,6 @@
 package com.example.nuber
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.design.widget.NavigationView
@@ -9,6 +10,7 @@ import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_nav_bar.*
 import kotlinx.android.synthetic.main.app_bar_nav_bar.*
 
@@ -61,19 +63,16 @@ class NavBar : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListe
                 cambiaFragmento(NUberMapsActivity(), R.id.container_Fragment)
             }
             R.id.nav_gallery -> {
-                cambiaFragmento(NUberMapsActivity(), R.id. container_Fragment)
+                cambiaFragmento(NuberShoppingFragment(), R.id. container_Fragment)
             }
             R.id.nav_slideshow -> {
                 cambiaFragmento(NuberProductsFragment(), R.id.container_Fragment)
             }
-            R.id.nav_manage -> {
-
-            }
-            R.id.nav_share -> {
-
-            }
-            R.id.nav_send -> {
-
+            R.id.log_out-> {
+                FirebaseAuth.getInstance().signOut()
+                val intent = Intent(this, RegisterActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
+                startActivity(intent)
             }
         }
 

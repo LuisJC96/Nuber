@@ -33,10 +33,10 @@ class NuberShoppingFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         send_salad_button.setOnClickListener {
-            val  _db = FirebaseDatabase.getInstance().getReference("/salads")
+            val  _db = FirebaseDatabase.getInstance().getReference("salads")
             val k = _db.push().key
             val s = Salad(salad_name_edittext.text.toString(),
-                salad_description_edittext.text.toString(), k.toString())
+                salad_description_edittext.text.toString(),54.50, k.toString())
 
             _db.child(k!!).setValue(s).addOnCompleteListener {
                 Toast.makeText(activity, "Your purchase has been placed", Toast.LENGTH_LONG).show()

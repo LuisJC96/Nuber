@@ -26,16 +26,19 @@ class SaladViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
     RecyclerView.ViewHolder(inflater.inflate(R.layout.nuber_product_item, parent, false)) {
     private var saladNameTextView: TextView? = null
     private var saladDescrptionView: TextView? = null
+    private var saladPrecioView: TextView? = null
 
 
     init {
         saladNameTextView = itemView.findViewById(R.id.salad_name)
         saladDescrptionView = itemView.findViewById(R.id.salad_description)
+        saladPrecioView = itemView.findViewById(R.id.salad_precio)
     }
 
     fun bind(salad: Salad) {
         saladNameTextView?.text = salad.name
         saladDescrptionView?.text = salad.description
+        saladPrecioView?.text = "$" + salad.precio.toString()
     }
 
 }

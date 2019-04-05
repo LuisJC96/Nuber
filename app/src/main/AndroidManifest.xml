@@ -32,6 +32,11 @@
         -->
 
         <activity android:name=".RegisterActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+
+            </intent-filter>
         </activity>
         <activity android:name=".LoginActivity">
         </activity>
@@ -40,11 +45,7 @@
         <activity android:name=".NavBar"
                   android:label="@string/title_activity_nav_bar"
                   android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
 
-            </intent-filter>
         </activity>
         <meta-data
                 android:name="com.google.android.geo.API_KEY"
