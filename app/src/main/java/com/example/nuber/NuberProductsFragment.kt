@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.recyclerview.extensions.ListAdapter
 import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -59,7 +60,9 @@ class NuberProductsFragment : Fragment() {
             override fun onDataChange(p0: DataSnapshot) {
                 val lista = mutableListOf<Salad>()
                 p0.children.forEach{
+
                     val producto = it.getValue(Salad::class.java)
+                    Log.i("Producto:",it.toString())
                     lista.add(producto!!)
                     list_recycler_view.adapter = NuberProductsAdapter(lista)
                 }

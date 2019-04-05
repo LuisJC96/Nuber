@@ -5,11 +5,8 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
-import android.view.Menu
-import android.view.MenuItem
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 
@@ -26,11 +23,16 @@ import com.google.firebase.auth.FirebaseAuth
 class NUberMapsActivity : SupportMapFragment(),
     OnMapReadyCallback , GoogleMap.OnMarkerClickListener{
 
-    override fun onMarkerClick(p0: Marker?) = false
-
-    private lateinit var mMap: GoogleMap
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var lastLocation : Location
+
+    companion object {
+        private const val LOCATION_PERMISSION_REQUEST_CODE=1
+    }
+    override fun onMarkerClick(p0: Marker?) = false
+
+    private lateinit var map: GoogleMap
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,6 +40,7 @@ class NUberMapsActivity : SupportMapFragment(),
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity!!)
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         getMapAsync(this)
+
     }
 
     /**
@@ -51,30 +54,39 @@ class NUberMapsActivity : SupportMapFragment(),
      */
     @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
-        mMap = googleMap
+        map = googleMap
         // Add a marker in Sydney and move the camera
-        mMap.getUiSettings().setZoomControlsEnabled(true)
-        mMap.setOnMarkerClickListener(this)
-        mMap.isMyLocationEnabled = true
-        mMap.mapType = GoogleMap.MAP_TYPE_TERRAIN
-        fusedLocationClient.lastLocation.addOnSuccessListener(activity!!) { location ->
-            if (location != null) {
-                lastLocation = location
-                val currentLatLng = LatLng(location.latitude, location.longitude)
 
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 12f))
-                placeMarkerOnMap(currentLatLng)
-            }
+        map.setOnMarkerClickListener(this)
+        map.uiSettings.isZoomControlsEnabled= true
+
+        setUpMap()
+    }
+    private fun setUpMap(){
+        if(ActivityCompat.checkSelfPermission(activity!!, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        {
+            ActivityCompat.requestPermissions(activity!!, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
+            return
         }
 
-
+        map.isMyLocationEnabled = true
+        map.mapType = GoogleMap.MAP_TYPE_NORMAL
+        fusedLocationClient.lastLocation.addOnSuccessListener(activity!!) {
+            location ->
+            if(location!=null){
+                lastLocation = location
+                val currentLatLng = LatLng(location.latitude, location.longitude)
+                placeMarkerOnMap(currentLatLng)
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 17f))
+            }
+        }
     }
 
     private fun placeMarkerOnMap(location: LatLng) {
         val markerOptions = MarkerOptions().position(location)
-        val titleStr =  "Hello END GAME HYPE; CM dies"//getAddress(location)  // add these two lines
+        val titleStr =  "I am Here!"//getAddress(location)  // add these two lines
         markerOptions.title(titleStr)
-        mMap.addMarker(markerOptions)
+        map.addMarker(markerOptions)
     }
 
 
