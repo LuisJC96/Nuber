@@ -87,11 +87,13 @@ class NUberMapsActivity : SupportMapFragment(),
                 val currentLatLng = LatLng(location.latitude, location.longitude)
                 placeMarkerOnMap(currentLatLng)
                 map.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 17f))
+                val location2 = LatLng(19.44, -99.909)
+                placeMarkerOnMap(location2)
+                val URL = getDirectionURL(LatLng(lastLocation.latitude, lastLocation.longitude), location2)
+                GetDirection(URL).execute()
             }
         }
-        val location = LatLng(19.26, 99.09)
-        val URL = getDirectionURL(LatLng(location.latitude, location.longitude), location)
-        GetDirection(URL).execute()
+
     }
     fun getDirectionURL(origin:LatLng, dest:LatLng): String{
         val result = "https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}" +
