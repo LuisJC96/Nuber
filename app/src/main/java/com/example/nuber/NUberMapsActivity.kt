@@ -4,9 +4,12 @@ package com.example.nuber
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.location.Location
+import android.os.AsyncTask
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
+import android.util.Log
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 
@@ -17,7 +20,12 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.PolylineOptions
 import com.google.firebase.auth.FirebaseAuth
+import com.google.gson.Gson
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import java.lang.Exception
 
 
 class NUberMapsActivity : SupportMapFragment(),
@@ -71,6 +79,7 @@ class NUberMapsActivity : SupportMapFragment(),
 
         map.isMyLocationEnabled = true
         map.mapType = GoogleMap.MAP_TYPE_NORMAL
+
         fusedLocationClient.lastLocation.addOnSuccessListener(activity!!) {
             location ->
             if(location!=null){
@@ -80,8 +89,91 @@ class NUberMapsActivity : SupportMapFragment(),
                 map.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 17f))
             }
         }
+        val location = LatLng(19.26, 99.09)
+        val URL = getDirectionURL(LatLng(location.latitude, location.longitude), location)
+        GetDirection(URL).execute()
+    }
+    fun getDirectionURL(origin:LatLng, dest:LatLng): String{
+        val result = "https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}" +
+                "&destination=${dest.latitude},${dest.longitude}&sensor=false&mode=driving"
+        return result
+    }
+    private inner class GetDirection(val url : String) : AsyncTask<Void,Void,List<List<LatLng>>>(){
+        override fun doInBackground(vararg params: Void?): List<List<LatLng>> {
+            val client = OkHttpClient()
+            val request = Request.Builder().url(url).build()
+            val response = client.newCall(request).execute()
+            val data = response.body()!!.string()
+            Log.d("GoogleMap" , " data : $data")
+            val result =  ArrayList<List<LatLng>>()
+            try{
+                val respObj = Gson().fromJson(data,GoogleMapDTO::class.java)
+
+                val path =  ArrayList<LatLng>()
+
+                for (i in 0..(respObj.routes[0].legs[0].steps.size-1)){
+//                    val startLatLng = LatLng(respObj.routes[0].legs[0].steps[i].start_location.lat.toDouble()
+//                            ,respObj.routes[0].legs[0].steps[i].start_location.lng.toDouble())
+//                    path.add(startLatLng)
+//                    val endLatLng = LatLng(respObj.routes[0].legs[0].steps[i].end_location.lat.toDouble()
+//                            ,respObj.routes[0].legs[0].steps[i].end_location.lng.toDouble())
+                    path.addAll(decodePolyline(respObj.routes[0].legs[0].steps[i].polyline.points))
+                }
+                result.add(path)
+            }catch (e:Exception){
+                e.printStackTrace()
+            }
+            return result
+        }
+
+        override fun onPostExecute(result: List<List<LatLng>>) {
+            val lineoption = PolylineOptions()
+            for (i in result.indices){
+                lineoption.addAll(result[i])
+                lineoption.width(10f)
+                lineoption.color(Color.BLUE)
+                lineoption.geodesic(true)
+            }
+            map.addPolyline(lineoption)
+        }
     }
 
+    public fun decodePolyline(encoded: String): List<LatLng> {
+
+        val poly = ArrayList<LatLng>()
+        var index = 0
+        val len = encoded.length
+        var lat = 0
+        var lng = 0
+
+        while (index < len) {
+            var b: Int
+            var shift = 0
+            var result = 0
+            do {
+                b = encoded[index++].toInt() - 63
+                result = result or (b and 0x1f shl shift)
+                shift += 5
+            } while (b >= 0x20)
+            val dlat = if (result and 1 != 0) (result shr 1).inv() else result shr 1
+            lat += dlat
+
+            shift = 0
+            result = 0
+            do {
+                b = encoded[index++].toInt() - 63
+                result = result or (b and 0x1f shl shift)
+                shift += 5
+            } while (b >= 0x20)
+            val dlng = if (result and 1 != 0) (result shr 1).inv() else result shr 1
+            lng += dlng
+
+            val latLng = LatLng((lat.toDouble() / 1E5),(lng.toDouble() / 1E5))
+            poly.add(latLng)
+        }
+
+        return poly
+    }
     private fun placeMarkerOnMap(location: LatLng) {
         val markerOptions = MarkerOptions().position(location)
         val titleStr =  "I am Here!"//getAddress(location)  // add these two lines
@@ -98,5 +190,8 @@ class NUberMapsActivity : SupportMapFragment(),
             startActivity(intent)
         }
     }
-
 }
+
+
+
+
