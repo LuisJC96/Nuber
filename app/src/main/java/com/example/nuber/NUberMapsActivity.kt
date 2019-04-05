@@ -87,7 +87,7 @@ class NUberMapsActivity : SupportMapFragment(),
                 val currentLatLng = LatLng(location.latitude, location.longitude)
                 placeMarkerOnMap(currentLatLng)
                 map.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 17f))
-                val location2 = LatLng(19.44, -99.909)
+                val location2 = LatLng(19.44, -98.5)
                 placeMarkerOnMap(location2)
                 val URL = getDirectionURL(LatLng(lastLocation.latitude, lastLocation.longitude), location2)
                 GetDirection(URL).execute()
